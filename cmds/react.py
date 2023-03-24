@@ -5,5 +5,5 @@ from core.cog_ext import cog_ext
 
 class react(cog_ext):
 	pass
-def setup(bot):
-	bot.add_cog(react(bot))
+async def setup(bot):
+	await bot.add_cog(react(bot))
