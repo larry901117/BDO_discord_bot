@@ -22,8 +22,6 @@ def fmt_time(datetime):
     return datetime.strftime("%w %H %M")
 
 
-
-
 class Task(cog_ext):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -47,22 +45,21 @@ class Task(cog_ext):
                     'hour'] + " " + row['minute']
                 if boss_appear_time == fmt_time(now):
                     await self.channel.send("Boss " + row['boss'] + " 已經出現")
-                    #print(fmt_time(now))
-                    #print(boss_appear_time)
+                    # print(fmt_time(now))
+                    # print(boss_appear_time)
                     print(row['boss'])
                     await asyncio.sleep(60)
 
                 elif boss_appear_time == fmt_time(now + delta):
                     await self.channel.send("Boss " + row['boss'] + " 15分後出現")
-                    #print(fmt_time(now))
-                    #print(boss_appear_time)
+                    # print(fmt_time(now))
+                    # print(boss_appear_time)
                     print(row['boss'])
                     await asyncio.sleep(60)
             if now.strftime("%H %M") == "00 00":
-              await self.channel.purge(limit=100,check=lambda m: m.author == self.bot.user)
-            #print(fmt_time(now))
+                await self.channel.purge(limit=100, check=lambda m: m.author == self.bot.user)
+            # print(fmt_time(now))
             await asyncio.sleep(5)
-
 
     @commands.command()
     async def stop_loop(self, ctx):
@@ -78,4 +75,5 @@ class Task(cog_ext):
 
 
 async def setup(bot):
-    await bot.add_cog(Task(bot))
+    # await bot.add_cog(Task(bot))
+    pass
