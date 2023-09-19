@@ -123,6 +123,8 @@ async def on_message(message):
             TEMP_LIST.append(received_content)
         else:
             await message.reply(r"問第二次就是大凶 No doubt, bitch")
+        if len(TEMP_LIST) >= 20:
+            TEMP_LIST = []
 
     await bot.process_commands(message)
 
