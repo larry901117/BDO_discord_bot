@@ -102,12 +102,12 @@ async def on_message(message):
                                                                    jdata["ID_CHANNEL_BOT_TESTER"]]:
         received_content = ReceivedText(message.author.display_name, message.content)
         is_duplicate_asking = False
-        for content in TEMP_LIST:
-            time_delta = received_content.timestamp - content.timestamp
-            print(time_delta)
-            if time_delta < datetime.timedelta(seconds=7200) \
-                    and content.author == received_content.author and content.content == received_content.content:
-                is_duplicate_asking = True
+        if len(TEMP_LIST) > 0:
+            for content in TEMP_LIST:
+                time_delta = received_content.timestamp - content.timestamp
+                if time_delta < datetime.timedelta(seconds=7200) \
+                        and content.author == received_content.author and content.content == received_content.content:
+                    is_duplicate_asking = True
         if not is_duplicate_asking:
             ret = random.choices(FORTUNE_LIST, weights=FORTUNE_RATIO_LIST)[0]
             image_list = os.listdir("images")
