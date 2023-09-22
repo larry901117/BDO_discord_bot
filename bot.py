@@ -137,7 +137,7 @@ async def on_ready():
     print("Now I'm logging as ", BOT.user)
     trigger.init_trigger()
 
-    for Filename in os.listdir('./cmds'):
+    for Filename in os.listdir(ABS_PATH + 'cmds'):
         if Filename.endswith('.py'):
             await BOT.load_extension(f'cmds.{Filename[:-3]}')
 
