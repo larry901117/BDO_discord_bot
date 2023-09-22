@@ -1,6 +1,9 @@
 import csv
+import os
 
-TRIGGER_CSV = "trigger.csv"
+
+ABS_PATH = os.path.abspath(os.path.dirname(__file__)) + os.sep
+TRIGGER_CSV = ABS_PATH + "trigger.csv"
 TRIGGER_LIST = []
 
 

@@ -8,9 +8,9 @@ import json
 # import keep_alive
 import random
 
-intents = discord.Intents.all()
+INTENTS = discord.Intents.all()
 
-bot = commands.Bot(command_prefix="?", intents=intents)
+BOT = commands.Bot(command_prefix="?", intents=INTENTS)
 
 TEMP_LIST = []
 FORTUNE_LIST = [
@@ -19,12 +19,15 @@ FORTUNE_LIST = [
 ]
 FORTUNE_RATIO_LIST = [30, 15, 4, 30, 15, 4, 1 / 3, 1 / 3, 1 / 3]
 
-with open('setting.json', 'r') as jfile:
-    jdata = json.load(jfile)
+ABS_PATH = os.path.abspath(os.path.dirname(__file__)) + os.sep
+SETTING_FILE = ABS_PATH + "setting.json"
+
+with open(SETTING_FILE, 'r') as jfile:
+    SETTINGS = json.load(jfile)
 
 
 def is_mod(user_id):
-    return user_id in jdata['MOD_ID']
+    return user_id in SETTINGS['MOD_ID']
 
 
 class ReceivedText:
@@ -34,23 +37,23 @@ class ReceivedText:
         self.content = content
 
 
-@bot.command()
+@BOT.command()
 async def unload(ctx, extension):
     if is_mod(ctx.author.id):
-        await bot.unload_extension(f'cmd.{extension}')
+        await BOT.unload_extension(f'cmd.{extension}')
         await ctx.send(f'{extension} is unloaded')
 
 
-@bot.command()
+@BOT.command()
 async def reload(ctx):
     if is_mod(ctx.author.id):
         for Filename in os.listdir('./cmds'):
             if Filename.endswith('.py'):
-                await bot.reload_extension(f'cmds.{Filename[:-3]}')
+                await BOT.reload_extension(f'cmds.{Filename[:-3]}')
                 await ctx.send(f'{Filename[:-3]} is loaded')
 
 
-@bot.event
+@BOT.event
 async def on_member_join(member):
     embed = discord.Embed(title=":loudspeaker: 汪!汪汪!!", type="rich", color=0x8400ff,
                           description=f"歡迎<@{member.id}> 加入十九層開發建設!\n"
@@ -67,17 +70,17 @@ async def on_member_join(member):
                                             "-KtgMOjlagjhhS8fNM/edit#gid=1195001495")
     view.add_item(link_to_rule_btn)
     view.add_item(link_to_doc_btn)
-    await bot.get_channel(jdata["ID_CHANNEL_BOT_WELCOME"]).send(view=view, embed=embed)
+    await BOT.get_channel(SETTINGS["ID_CHANNEL_BOT_WELCOME"]).send(view=view, embed=embed)
 
 
-@bot.event
+@BOT.event
 async def on_member_remove(member):
-    await bot.get_channel(jdata["ID_CHANNEL_BOT_WELCOME"]).send(f"{member.id} has left")
+    await BOT.get_channel(SETTINGS["ID_CHANNEL_BOT_WELCOME"]).send(f"{member.id} has left")
 
 
-@bot.event
+@BOT.event
 async def on_message(message):
-    if message.author == bot.user:
+    if message.author == BOT.user:
         return
     try:
         channel_name = message.channel.name
@@ -98,8 +101,8 @@ async def on_message(message):
                 value = value + " " + str(temp[i])
             trigger.add_trigger(key, value)
             await message.channel.send("指令已新增, " + key + ", " + value)
-    if message.content.endswith("運勢") and message.channel.id in [jdata["ID_CHANNEL_BOT_LOTTERY"],
-                                                                   jdata["ID_CHANNEL_BOT_TESTER"]]:
+    if message.content.endswith("運勢") and message.channel.id in [SETTINGS["ID_CHANNEL_BOT_LOTTERY"],
+                                                                   SETTINGS["ID_CHANNEL_BOT_TESTER"]]:
         received_content = ReceivedText(message.author.display_name, message.content)
         is_duplicate_asking = False
         global TEMP_LIST
@@ -126,17 +129,17 @@ async def on_message(message):
         if len(TEMP_LIST) >= 20:
             TEMP_LIST = []
 
-    await bot.process_commands(message)
+    await BOT.process_commands(message)
 
 
-@bot.event
+@BOT.event
 async def on_ready():
-    print("Now I'm logging as ", bot.user)
+    print("Now I'm logging as ", BOT.user)
     trigger.init_trigger()
 
     for Filename in os.listdir('./cmds'):
         if Filename.endswith('.py'):
-            await bot.load_extension(f'cmds.{Filename[:-3]}')
+            await BOT.load_extension(f'cmds.{Filename[:-3]}')
 
 
 if __name__ == "__main__":
@@ -144,4 +147,4 @@ if __name__ == "__main__":
     print('bot starting')
     import dotenv
     dotenv.load_dotenv()
-    bot.run(os.getenv('TOKEN'))  # token
+    BOT.run(os.getenv('TOKEN'))  # token

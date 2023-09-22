@@ -1,13 +1,15 @@
-from os import pipe
-import discord
+import os
 from discord.ext import commands
 from core.cog_ext import cog_ext
 import asyncio, datetime, json, csv, pytz
 
 BOSS_TIME_LIST = []
 
-with open('setting.json', 'r') as jfile:
-    jdata = json.load(jfile)
+ABS_PATH = os.path.abspath(os.path.dirname(os.path.dirname(__file__))) + os.sep
+SETTING_FILE = ABS_PATH + "setting.json"
+
+with open(SETTING_FILE, 'r') as jfile:
+    SETTINGS = json.load(jfile)
 
 
 def init_boss_time():
@@ -30,7 +32,7 @@ class Task(cog_ext):
 
     async def interval(self):
         await self.bot.wait_until_ready()
-        self.channel = self.bot.get_channel(jdata['ID_CHANNEL_BOSS_ALARM'])
+        self.channel = self.bot.get_channel(SETTINGS['ID_CHANNEL_BOSS_ALARM'])
         ##await self.channel.send("Boss 鬧鐘已開啟")
         while not self.bot.is_closed():
             tw = pytz.timezone('Asia/Taipei')
@@ -45,33 +47,28 @@ class Task(cog_ext):
                     'hour'] + " " + row['minute']
                 if boss_appear_time == fmt_time(now):
                     await self.channel.send("Boss " + row['boss'] + " 已經出現")
-                    # print(fmt_time(now))
-                    # print(boss_appear_time)
                     print(row['boss'])
                     await asyncio.sleep(60)
 
                 elif boss_appear_time == fmt_time(now + delta):
                     await self.channel.send("Boss " + row['boss'] + " 15分後出現")
-                    # print(fmt_time(now))
-                    # print(boss_appear_time)
                     print(row['boss'])
                     await asyncio.sleep(60)
             if now.strftime("%H %M") == "00 00":
                 await self.channel.purge(limit=100, check=lambda m: m.author == self.bot.user)
-            # print(fmt_time(now))
             await asyncio.sleep(5)
 
     @commands.command()
     async def stop_loop(self, ctx):
         self.bg_task.cancel()
         print(asyncio.all_tasks())
-        self.channel = self.bot.get_channel(jdata['ID_CHANNEL_BOT_TESTER'])
+        self.channel = self.bot.get_channel(SETTINGS['ID_CHANNEL_BOT_TESTER'])
         await self.channel.send("Boss 鬧鐘已關閉")
 
     @commands.command()
     async def start_loop(self, ctx):
         self.bg_task = self.bot.loop.create_task(self.interval())
-        self.channel = self.bot.get_channel(jdata['ID_CHANNEL_BOT_TESTER'])
+        self.channel = self.bot.get_channel(SETTINGS['ID_CHANNEL_BOT_TESTER'])
 
 
 async def setup(bot):
