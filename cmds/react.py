@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import re
@@ -78,7 +79,7 @@ class React(cog_ext):
     @commands.command()
     async def mod(self, ctx):
         if is_mod(ctx.author.id):
-            await ctx.send(ctx.message.author.id)
+            await ctx.send(SETTINGS['MOD_ID'])
         else:
             await ctx.message.channel.send("This function only can be used by MOD.")
 
@@ -133,19 +134,24 @@ class React(cog_ext):
         await ctx.message.channel.send(file=discord.File("images"+os.sep+image))
 
     @commands.command()
-    async def FBI(self, ctx):
+    async def FBI(self, ctx, member: discord.Member=None):
         if ctx.message.author.id in SETTINGS["POLICE_IDs"]:
-            if ctx.message.author.voice.channel.members:
-                member_list = ctx.message.author.voice.channel.members
-                lucky_one = random.choice(member_list) 
-                lucky_one.voice.mute = True
+            Muted = discord.utils.get(ctx.guild.roles, name="Muted")
+            if member is None:
+                if ctx.message.author.voice.channel is not None:
+                    member_list = ctx.message.author.voice.channel.members
+                    member = random.choice(member_list) 
+                else:
+                    print("User has not joined a voice channel")
+            try:
+                member.add_roles(Muted)
                 mute_time = random.randint(1,100)
-                await ctx.message.channel.send(f"{lucky_one.display_name} 已經被警吉逮捕,靜音{mute_time}秒")
-                time.sleep(mute_time)
-                lucky_one.voice.mute = False
-                await ctx.message.channel.send(f"{lucky_one.display_name} 已經假釋出獄")
-            else:
-                print("User has not joined a voice channel")
+                await ctx.message.channel.send(f"{member.display_name} 已經被警吉逮捕,靜音{mute_time}秒")
+                await asyncio.sleep(int(mute_time))
+                member.remove_roles(Muted)
+                await ctx.message.channel.send(f"{member.display_name} 已經假釋出獄")
+            except Exception:
+                print(sys.exc_info())
 
     @commands.command()
     async def add_police(self, ctx):
