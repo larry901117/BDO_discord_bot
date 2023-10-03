@@ -2,17 +2,28 @@ import json
 import os
 import re
 import sys
-
+import random
+import time
 import discord
 from discord.ext import commands
 from core.cog_ext import cog_ext
 
-with open('setting.json', 'r') as jfile:
-    jdata = json.load(jfile)
 
+ABS_PATH = os.path.abspath(os.path.dirname(os.path.dirname(__file__))) + os.sep
+SETTING_FILE = ABS_PATH + "setting.json"
+
+
+
+with open(SETTING_FILE, 'r') as jfile:
+    SETTINGS = json.load(jfile)
+
+def reload_setting():
+    global SETTINGS
+    with open(SETTING_FILE, 'r') as jfile:
+        SETTINGS = json.load(jfile)
 
 def is_mod(user_id):
-    return user_id in jdata['MOD_ID']
+    return user_id in SETTINGS['MOD_ID']
 
 
 class React(cog_ext):
@@ -45,7 +56,7 @@ class React(cog_ext):
 
     @commands.command()
     async def advice(self, ctx):
-        ctx.channel = ctx.bot.get_channel(jdata["ID_CHANNEL_GUILD_ADVICE"])
+        ctx.channel = ctx.bot.get_channel(SETTINGS["ID_CHANNEL_GUILD_ADVICE"])
         await ctx.send(re.sub(r"(\?advice\s+)", "", ctx.message.content))
 
     @commands.command()
@@ -121,6 +132,45 @@ class React(cog_ext):
         image = random.choices(image_list)[0]
         await ctx.message.channel.send(file=discord.File("images"+os.sep+image))
 
+    @commands.command()
+    async def FBI(self, ctx):
+        if ctx.message.author.id in SETTINGS["POLICE_IDs"]:
+            member_list = ctx.message.author.voice.channel.members
+            lucky_one = random.choice(member_list) 
+            lucky_one.voice.mute = True
+            await ctx.message.channel.send(f"{lucky_one.display_name} 已經被警吉逮捕,靜音10秒")
+            time.sleep(10)
+            lucky_one.voice.mute = False
+            await ctx.message.channel.send(f"{lucky_one.display_name} 已經假釋出獄")
+
+    @commands.command()
+    async def add_police(self, ctx):
+        if is_mod(ctx.author.id):
+            try:
+                keyword = re.sub(r"(\?add_police\s+)", "", ctx.message.content)
+                user = discord.utils.get(ctx.message.guild.members, name=keyword)
+                with open(SETTING_FILE, 'w') as jfile:
+                    jfile["POLICE_IDs"].append(user)
+            except Exception as e:
+                print(str(e))
+            reload_setting()
+        else:
+            await ctx.message.channel.send("This function only can be used by MOD.")
+            
+    @commands.command()
+    async def add_mod(self, ctx):
+        if is_mod(ctx.author.id):
+            try:
+                keyword = re.sub(r"(\?add_mod\s+)", "", ctx.message.content)
+                user = discord.utils.get(ctx.message.guild.members, name=keyword)
+                with open(SETTING_FILE, 'w') as jfile:
+                    jfile["MOD_ID"].append(user)
+            except Exception as e:
+                print(str(e))
+        else:
+            await ctx.message.channel.send("This function only can be used by MOD.")
+        reload_setting()
+            
 
 async def setup(bot):
     await bot.add_cog(React(bot))

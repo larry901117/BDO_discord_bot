@@ -1,11 +1,5 @@
-import discord
 from discord.ext import commands
 from core.cog_ext import cog_ext
-import re
-import json
-
-with open('setting.json', 'r') as jfile:
-    jdata = json.load(jfile)
 
 
 class Main(cog_ext):
