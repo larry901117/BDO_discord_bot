@@ -79,14 +79,14 @@ class React(cog_ext):
     @commands.command()
     async def mod(self, ctx):
         if is_mod(ctx.author.id):
-            mod_list = [mod_list.append(discord.utils.get(ctx.message.guild.members, id=id).display_name) for id in SETTINGS['MOD_ID']]
+            mod_list = [discord.utils.get(ctx.message.guild.members, id=id).display_name for id in SETTINGS['MOD_ID']]
             await ctx.send(mod_list)
         else:
             await ctx.message.channel.send("This function only can be used by MOD.")
     @commands.command()
     async def police(self, ctx):
         if ctx.message.author.id in SETTINGS["POLICE_IDs"]:
-            police_list = [police_list.append(discord.utils.get(ctx.message.guild.members, id=id).display_name) for id in SETTINGS['POLICE_IDs']]
+            police_list = [discord.utils.get(ctx.message.guild.members, id=id).display_name for id in SETTINGS['POLICE_IDs']]
             await ctx.send(police_list)
         else:
             await ctx.message.channel.send("This function only can be used by MOD.")
