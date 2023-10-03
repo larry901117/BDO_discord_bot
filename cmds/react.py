@@ -83,6 +83,13 @@ class React(cog_ext):
             await ctx.send(mod_list)
         else:
             await ctx.message.channel.send("This function only can be used by MOD.")
+    @commands.command()
+    async def police(self, ctx):
+        if ctx.message.author.id in SETTINGS["POLICE_IDs"]:
+            police_list = [police_list.append(discord.utils.get(ctx.message.guild.members, id=id).display_name) for id in SETTINGS['POLICE_IDs']]
+            await ctx.send(police_list)
+        else:
+            await ctx.message.channel.send("This function only can be used by MOD.")
 
     @commands.command()
     async def purge(self, ctx, num: int):
