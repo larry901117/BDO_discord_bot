@@ -152,11 +152,11 @@ class React(cog_ext):
                 else:
                     print("User has not joined a voice channel")
             try:
-                member.add_roles(Muted)
+                member.edit(mute=True)
                 mute_time = random.randint(1,100)
                 await ctx.message.channel.send(f"{member.display_name} 已經被警吉逮捕,靜音{mute_time}秒")
                 await asyncio.sleep(int(mute_time))
-                member.remove_roles(Muted)
+                member.edit(mute=False)
                 await ctx.message.channel.send(f"{member.display_name} 已經假釋出獄")
             except Exception:
                 print(sys.exc_info())
