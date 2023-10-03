@@ -139,8 +139,9 @@ class React(cog_ext):
                 member_list = ctx.message.author.voice.channel.members
                 lucky_one = random.choice(member_list) 
                 lucky_one.voice.mute = True
-                await ctx.message.channel.send(f"{lucky_one.display_name} 已經被警吉逮捕,靜音10秒")
-                time.sleep(10)
+                mute_time = random.randint(1,100)
+                await ctx.message.channel.send(f"{lucky_one.display_name} 已經被警吉逮捕,靜音{mute_time}秒")
+                time.sleep(mute_time)
                 lucky_one.voice.mute = False
                 await ctx.message.channel.send(f"{lucky_one.display_name} 已經假釋出獄")
             else:
@@ -152,8 +153,9 @@ class React(cog_ext):
             try:
                 keyword = re.sub(r"(\?add_police\s+)", "", ctx.message.content)
                 user = discord.utils.get(ctx.message.guild.members, name=keyword)
-                with open(SETTING_FILE, 'w') as jfile:
-                    jfile["POLICE_IDs"].append(user)
+                SETTINGS["POLICE_IDs"].append(user.id)
+                with open(SETTING_FILE, 'w') as file:
+                    file.write(json.dumps(SETTINGS, separators=(',', ':'), indent=2))
             except Exception as e:
                 print(str(e))
             reload_setting()
@@ -166,8 +168,9 @@ class React(cog_ext):
             try:
                 keyword = re.sub(r"(\?add_mod\s+)", "", ctx.message.content)
                 user = discord.utils.get(ctx.message.guild.members, name=keyword)
-                with open(SETTING_FILE, 'w') as jfile:
-                    jfile["MOD_ID"].append(user)
+                SETTINGS["MOD_ID"].append(user.id)
+                with open(SETTING_FILE, 'w') as file:
+                    file.write(json.dumps(SETTINGS, separators=(',', ':'), indent=2))
             except Exception as e:
                 print(str(e))
         else:
