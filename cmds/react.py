@@ -135,13 +135,16 @@ class React(cog_ext):
     @commands.command()
     async def FBI(self, ctx):
         if ctx.message.author.id in SETTINGS["POLICE_IDs"]:
-            member_list = ctx.message.author.voice.channel.members
-            lucky_one = random.choice(member_list) 
-            lucky_one.voice.mute = True
-            await ctx.message.channel.send(f"{lucky_one.display_name} 已經被警吉逮捕,靜音10秒")
-            time.sleep(10)
-            lucky_one.voice.mute = False
-            await ctx.message.channel.send(f"{lucky_one.display_name} 已經假釋出獄")
+            if ctx.message.author.voice.channel.members:
+                member_list = ctx.message.author.voice.channel.members
+                lucky_one = random.choice(member_list) 
+                lucky_one.voice.mute = True
+                await ctx.message.channel.send(f"{lucky_one.display_name} 已經被警吉逮捕,靜音10秒")
+                time.sleep(10)
+                lucky_one.voice.mute = False
+                await ctx.message.channel.send(f"{lucky_one.display_name} 已經假釋出獄")
+            else:
+                print("User has not joined a voice channel")
 
     @commands.command()
     async def add_police(self, ctx):
