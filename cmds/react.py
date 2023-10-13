@@ -223,9 +223,9 @@ class React(cog_ext):
     #         embed.set_image(url=f"attachment://{file.filename}")
     #         embed.set_author(name="十九層地獄神犬詛咒")
     #         await ctx.message.channel.send(file=file, embed=embed)
-    @commands.command()
-    async def AI(self,ctx):
-        response = requests.post("https://api.bard.ai/v1/query", json={"question": ctx.message.content})
-        await ctx.message.channel.send(response.json()["answer"])
+    # @commands.command()
+    # async def AI(self,ctx):
+    #     response = requests.post("https://api.bard.ai/v1/query", json={"question": ctx.message.content})
+    #     await ctx.message.channel.send(response.json()["answer"])
 async def setup(bot):
     await bot.add_cog(React(bot))
