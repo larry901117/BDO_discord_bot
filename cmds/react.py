@@ -8,6 +8,7 @@ import time
 import discord
 from discord.ext import commands
 from core.cog_ext import cog_ext
+import requests
 
 
 ABS_PATH = os.path.abspath(os.path.dirname(os.path.dirname(__file__))) + os.sep
@@ -141,48 +142,48 @@ class React(cog_ext):
         image = random.choices(image_list)[0]
         await ctx.message.channel.send(file=discord.File("images"+os.sep+image))
 
-    @commands.command()
-    async def FBI(self, ctx, member: discord.Member=None):
-        if ctx.message.author.id in SETTINGS["POLICE_IDs"]:
-            Muted = discord.utils.get(ctx.guild.roles, name="Muted")
-            if member is None:
-                if ctx.message.author.voice.channel is not None:
-                    member_list = ctx.message.author.voice.channel.members
-                    member = random.choice(member_list) 
-                else:
-                    print("User has not joined a voice channel")
-            try:
-                await member.edit(mute=True)
-                mute_time = random.randint(1,100)
-                await ctx.message.channel.send(f"{member.display_name} 已經被警吉逮捕,靜音{mute_time}秒")
-                await asyncio.sleep(int(mute_time))
-                await member.edit(mute=False)
-                await ctx.message.channel.send(f"{member.display_name} 已經假釋出獄")
-            except Exception:
-                print(sys.exc_info())
+    # @commands.command()
+    # async def FBI(self, ctx, member: discord.Member=None):
+    #     if ctx.message.author.id in SETTINGS["POLICE_IDs"]:
+    #         Muted = discord.utils.get(ctx.guild.roles, name="Muted")
+    #         if member is None:
+    #             if ctx.message.author.voice.channel is not None:
+    #                 member_list = ctx.message.author.voice.channel.members
+    #                 member = random.choice(member_list) 
+    #             else:
+    #                 print("User has not joined a voice channel")
+    #         try:
+    #             await member.edit(mute=True)
+    #             mute_time = random.randint(1,100)
+    #             await ctx.message.channel.send(f"{member.display_name} 已經被警吉逮捕,靜音{mute_time}秒")
+    #             await asyncio.sleep(int(mute_time))
+    #             await member.edit(mute=False)
+    #             await ctx.message.channel.send(f"{member.display_name} 已經假釋出獄")
+    #         except Exception:
+    #             print(sys.exc_info())
 
-    @commands.command()
-    async def add_police(self, ctx):
-        if is_mod(ctx.author.id):
-            try:
-                keyword = re.sub(r"(\?add_police\s+)", "", ctx.message.content)
-                user = discord.utils.get(ctx.message.guild.members, name=keyword)
-                SETTINGS["POLICE_IDs"].append(user.id)
-                with open(SETTING_FILE, 'w') as file:
-                    file.write(json.dumps(SETTINGS, separators=(',', ':'), indent=2))
-            except Exception as e:
-                print(str(e))
-            reload_setting()
-        else:
-            await ctx.message.channel.send("This function only can be used by MOD.")
+    # @commands.command()
+    # async def add_police(self, ctx):
+    #     if is_mod(ctx.author.id):
+    #         try:
+    #             keyword = re.sub(r"(\?add_police\s+)", "", ctx.message.content)
+    #             user = discord.utils.get(ctx.message.guild.members, name=keyword)
+    #             SETTINGS["POLICE_IDs"].append(user.id)
+    #             with open(SETTING_FILE, 'w') as file:
+    #                 file.write(json.dumps(SETTINGS, separators=(',', ':'), indent=2))
+    #         except Exception as e:
+    #             print(str(e))
+    #         reload_setting()
+    #     else:
+    #         await ctx.message.channel.send("This function only can be used by MOD.")
             
     @commands.command()
-    async def add_mod(self, ctx):
+    async def add_mod(self, ctx, member: discord.Member=None):
         if is_mod(ctx.author.id):
             try:
-                keyword = re.sub(r"(\?add_mod\s+)", "", ctx.message.content)
-                user = discord.utils.get(ctx.message.guild.members, name=keyword)
-                SETTINGS["MOD_ID"].append(user.id)
+                # keyword = re.sub(r"(\?add_mod\s+)", "", ctx.message.content)
+                # user = discord.utils.get(ctx.message.guild.members, name=keyword)
+                SETTINGS["MOD_ID"].append(member.id)
                 with open(SETTING_FILE, 'w') as file:
                     file.write(json.dumps(SETTINGS, separators=(',', ':'), indent=2))
             except Exception as e:
@@ -190,7 +191,41 @@ class React(cog_ext):
         else:
             await ctx.message.channel.send("This function only can be used by MOD.")
         reload_setting()
-            
+    
+    @commands.command()
+    async def rm_mod(self, ctx, member: discord.Member=None):
+        if is_mod(ctx.author.id):
+            try:
+                SETTINGS["MOD_ID"].remove(member.id)
+                with open(SETTING_FILE, 'w') as file:
+                    file.write(json.dumps(SETTINGS, separators=(',', ':'), indent=2))
+            except Exception as e:
+                print(str(e))
+        else:
+            await ctx.message.channel.send("This function only can be used by MOD.")
+        reload_setting()
 
+    # @commands.command()
+    # @commands.cooldown(1, 600, commands.BucketType.user)
+    # async def 詛咒(self,ctx,member: discord.Member=None):
+    #     if ctx.message.channel.id in [SETTINGS["ID_CHANNEL_BOT_LOTTERY"],SETTINGS["ID_CHANNEL_BOT_TESTER"]]:
+    #         user = ctx.message.author
+    #         role = discord.utils.get(user.server.roles, name="詛咒師")
+    #         await user.add_roles(role)
+    #         curse_pic_dir = ABS_PATH+"curse_pic"
+    #         curse_list = json.load(open(ABS_PATH+"curse.json"),"r")
+    #         curse_num = random.randint(0,len(curse_list["picture"])-1)
+    #         file = discord.File(curse_pic_dir + os.sep + curse_list["picture"][curse_num], filename="image.png")
+    #         embed = discord.Embed(type="rich", 
+    #                               title=f"{member.display_name} 已經被 {user.displayname} 詛咒了", 
+    #                               description=curse_list["content"][curse_num]
+    #                               )
+    #         embed.set_image(url=f"attachment://{file.filename}")
+    #         embed.set_author(name="十九層地獄神犬詛咒")
+    #         await ctx.message.channel.send(file=file, embed=embed)
+    @commands.command()
+    async def AI(self,ctx):
+        response = requests.post("https://api.bard.ai/v1/query", json={"question": ctx.message.content})
+        await ctx.message.channel.send(response.json()["answer"])
 async def setup(bot):
     await bot.add_cog(React(bot))
