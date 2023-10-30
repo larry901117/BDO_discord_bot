@@ -5,6 +5,7 @@ import re
 import sys
 import random
 import time
+from typing import Optional
 import discord
 from discord.ext import commands
 from core.cog_ext import cog_ext
@@ -26,7 +27,6 @@ def reload_setting():
 
 def is_mod(user_id):
     return user_id in SETTINGS['MOD_ID']
-
 
 class React(cog_ext):
     @commands.command()
@@ -205,6 +205,17 @@ class React(cog_ext):
             await ctx.message.channel.send("This function only can be used by MOD.")
         reload_setting()
 
+
+    @commands.command()
+    async def add_role(self, ctx):
+        embed = discord.Embed(title="來拿身分組~~", type="rich", color=0x8400ff,
+                              description=f"點下面的按鈕就可以收到特定的通知喔\n"
+                                        "\n"
+                                        "討海人 - 部長的部定時3+3通知\n"
+                                        "廢墟飛機 - 薯片帶你去廢墟挖夢想",
+                              )
+        await ctx.message.channel.send(view=button_view(),embed = embed)
+
     # @commands.command()
     # @commands.cooldown(1, 600, commands.BucketType.user)
     # async def 詛咒(self,ctx,member: discord.Member=None):
@@ -229,3 +240,24 @@ class React(cog_ext):
     #     await ctx.message.channel.send(response.json()["answer"])
 async def setup(bot):
     await bot.add_cog(React(bot))
+
+
+class button_view(discord.ui.View):
+    def __init__(self) -> None:
+        super().__init__(timeout=None)
+    
+    @discord.ui.button(label = "討海人", style = discord.ButtonStyle.green, custom_id = "sailer_button")
+    async def sailer(self, interaction: discord.Interaction, button: discord.ui.Button):
+        user = interaction.user
+        guild = interaction.guild
+        role = discord.utils.get(guild.roles, name="討海人")
+        await user.add_roles(role)
+        await interaction.response.send_message(f"I have given you {role.mention}!", ephemeral = True)
+
+    @discord.ui.button(label = "廢墟飛機", style = discord.ButtonStyle.gray, custom_id = "airplane_button")
+    async def airplane(self, interaction: discord.Interaction, button: discord.ui.Button):
+        user = interaction.user
+        guild = interaction.guild
+        role = discord.utils.get(guild.roles, name="廢墟飛機")
+        await user.add_roles(role)
+        await interaction.response.send_message(f"I have given you {role.mention}!", ephemeral = True)
