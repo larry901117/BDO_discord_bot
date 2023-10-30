@@ -211,7 +211,7 @@ class React(cog_ext):
         embed = discord.Embed(title="來拿身分組~~", type="rich", color=0x8400ff,
                               description=f"點下面的按鈕就可以收到特定的通知喔\n"
                                         "\n"
-                                        "討海人 - 部長的部定時3+3通知\n"
+                                        "討海人 - 部長的不定時3+3通知\n"
                                         "廢墟飛機 - 薯片帶你去廢墟挖夢想",
                               )
         await ctx.message.channel.send(view=button_view(),embed = embed)
