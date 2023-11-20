@@ -56,15 +56,15 @@ class React(cog_ext):
             trigger.remove_trigger(key)
             await ctx.channel.send("指令已移除, " + key)
 
-    @commands.hybrid_command(name="查巴哈",help="透過巴哈姆特論壇查詢特定關鍵字")
+    @commands.hybrid_command(name="查巴哈",help="透過巴哈姆特論壇查詢特定關鍵字",enabled=True)
     async def search(self, ctx, key_word:str):
         await ctx.message.channel.send("https://forum.gamer.com.tw/search.php?bsn=19017&q=" + key_word)
 
-    @commands.hybrid_command(name="查詢家門名",help="透過官網查詢玩家家門")
+    @commands.hybrid_command(name="查詢家門名",help="透過官網查詢玩家家門",enabled=True)
     async def search_player(self, ctx, player_name:str):
         await ctx.message.channel.send("https://www.tw.playblackdesert.com/Adventure?searchType=2&searchKeyword=" + player_name)
 
-    @commands.hybrid_command(name="查詢mod名單",description="mod專用")
+    @commands.hybrid_command(name="查詢mod名單",description="mod專用",enabled=True)
     async def mod(self, ctx):
         if is_mod(ctx.author.id):
             mod_list = [discord.utils.get(ctx.message.guild.members, id=id).display_name for id in SETTINGS['MOD_ID']]
@@ -72,7 +72,7 @@ class React(cog_ext):
         else:
             await ctx.message.channel.send("This function only can be used by MOD.")
 
-    @commands.hybrid_command(name="大量移除訊息", help="mod專用-批量移除訊息")
+    @commands.hybrid_command(name="大量移除訊息", help="mod專用-批量移除訊息",enabled=True)
     async def purge(self, ctx, num: int):
         if is_mod(ctx.author.id):
             await ctx.channel.purge(limit=num + 1)
@@ -123,7 +123,7 @@ class React(cog_ext):
         image = random.choices(image_list)[0]
         await ctx.message.channel.send(file=discord.File("images"+os.sep+image))
 
-    @commands.hybrid_command(name="新增mod",hidden=True,help="mod專用")
+    @commands.hybrid_command(name="新增mod",hidden=True,help="mod專用",enabled=True)
     async def add_mod(self, ctx, member: discord.Member=None):
         if is_mod(ctx.author.id):
             try:
@@ -138,7 +138,7 @@ class React(cog_ext):
             await ctx.message.channel.send("This function only can be used by MOD.")
         reload_setting()
     
-    @commands.hybrid_command(name="移除mod",hidden=True,help="mod專用")
+    @commands.hybrid_command(name="移除mod",hidden=True,help="mod專用",enabled=True)
     async def rm_mod(self, ctx, member: discord.Member=None):
         if is_mod(ctx.author.id):
             try:
@@ -152,7 +152,7 @@ class React(cog_ext):
         reload_setting()
 
 
-    @commands.hybrid_command(name="領身分組",help="領取身分組以獲得特定通知")
+    @commands.hybrid_command(name="領身分組",help="領取身分組以獲得特定通知",enabled=True)
     async def add_role(self, ctx):
         embed = discord.Embed(title="來拿身分組~~", type="rich", color=0x8400ff,
                               description=f"點下面的按鈕就可以收到特定的通知喔\n"
