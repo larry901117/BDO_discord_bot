@@ -123,7 +123,7 @@ class React(cog_ext):
         image = random.choices(image_list)[0]
         await ctx.message.channel.send(file=discord.File("images"+os.sep+image))
 
-    @commands.hybrid_command(name="新增mod",hidden=True,description="mod專用")
+    @commands.hybrid_command(name="新增mod",hidden=True,help="mod專用")
     async def add_mod(self, ctx, member: discord.Member=None):
         if is_mod(ctx.author.id):
             try:
@@ -138,7 +138,7 @@ class React(cog_ext):
             await ctx.message.channel.send("This function only can be used by MOD.")
         reload_setting()
     
-    @commands.hybrid_command(name="移除mod",hidden=True,description="mod專用")
+    @commands.hybrid_command(name="移除mod",hidden=True,help="mod專用")
     async def rm_mod(self, ctx, member: discord.Member=None):
         if is_mod(ctx.author.id):
             try:

@@ -10,7 +10,7 @@ import random
 
 INTENTS = discord.Intents.all()
 
-BOT = commands.Bot(command_prefix="/", intents=INTENTS)
+BOT = commands.Bot(command_prefix="?", intents=INTENTS)
 
 TEMP_LIST = []
 FORTUNE_LIST = [
