@@ -10,7 +10,7 @@ import random
 
 INTENTS = discord.Intents.all()
 
-BOT = commands.Bot(command_prefix="?", intents=INTENTS)
+BOT = commands.Bot(command_prefix="/", intents=INTENTS)
 
 TEMP_LIST = []
 FORTUNE_LIST = [
@@ -140,6 +140,12 @@ async def on_ready():
     for Filename in os.listdir(ABS_PATH + 'cmds'):
         if Filename.endswith('.py'):
             await BOT.load_extension(f'cmds.{Filename[:-3]}')
+    
+    try:
+        synced = await BOT.tree.sync()
+        print(f"Synced {synced} commands")
+    except Exception as e:
+        print("An error occurred while syncing: ", e)
 
 
 if __name__ == "__main__":

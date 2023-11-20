@@ -56,48 +56,41 @@ class React(cog_ext):
             trigger.remove_trigger(key)
             await ctx.channel.send("指令已移除, " + key)
 
-    @commands.command()
-    async def advice(self, ctx):
-        ctx.channel = ctx.bot.get_channel(SETTINGS["ID_CHANNEL_GUILD_ADVICE"])
-        await ctx.send(re.sub(r"(\?advice\s+)", "", ctx.message.content))
+    # @commands.command()
+    # async def advice(self, ctx):
+    #     ctx.channel = ctx.bot.get_channel(SETTINGS["ID_CHANNEL_GUILD_ADVICE"])
+    #     await ctx.send(re.sub(r"(\?advice\s+)", "", ctx.message.content))
 
-    @commands.command()
-    async def search(self, ctx):
-        if ctx.message.content == "?search":
-            await ctx.message.channel.send("Error ! 請輸入查詢內容")
-        else:
-            query_key = re.sub(" ", "%20", re.sub(r"(\?search\s+)", "", ctx.message.content))
-            await ctx.message.channel.send("https://forum.gamer.com.tw/search.php?bsn=19017&q=" + query_key)
+    @commands.hybrid_command(name="查巴哈",help="透過巴哈姆特論壇查詢特定關鍵字")
+    async def search(self, ctx, key_word:str):
+        await ctx.message.channel.send("https://forum.gamer.com.tw/search.php?bsn=19017&q=" + key_word)
 
-    @commands.command()
-    async def search_player(self, ctx):
-        if ctx.message.content == "?search_player":
-            await ctx.message.channel.send("Error ! 請輸入查詢內容")
-        else:
-            query_key = re.sub(" ", "%20", re.sub(r"(\?search_player\s+)", "", ctx.message.content))
-            await ctx.message.channel.send("https://www.tw.playblackdesert.com/Adventure?searchType=2&searchKeyword=" + query_key)
+    @commands.hybrid_command(name="查詢家門名",help="透過官網查詢玩家家門")
+    async def search_player(self, ctx, player_name:str):
+        await ctx.message.channel.send("https://www.tw.playblackdesert.com/Adventure?searchType=2&searchKeyword=" + player_name)
 
-    @commands.command()
+    @commands.hybrid_command(name="查詢mod名單")
     async def mod(self, ctx):
         if is_mod(ctx.author.id):
             mod_list = [discord.utils.get(ctx.message.guild.members, id=id).display_name for id in SETTINGS['MOD_ID']]
             await ctx.send(f"目前mod有: {mod_list}")
         else:
             await ctx.message.channel.send("This function only can be used by MOD.")
-    @commands.command()
-    async def police(self, ctx):
-        if ctx.message.author.id in SETTINGS["POLICE_IDs"]:
-            police_list = [discord.utils.get(ctx.message.guild.members, id=id).display_name for id in SETTINGS['POLICE_IDs']]
-            await ctx.send(f"目前警吉有: {police_list}")
-        else:
-            await ctx.message.channel.send("This function only can be used by MOD.")
+    # @commands.command()
+    # async def police(self, ctx):
+    #     if ctx.message.author.id in SETTINGS["POLICE_IDs"]:
+    #         police_list = [discord.utils.get(ctx.message.guild.members, id=id).display_name for id in SETTINGS['POLICE_IDs']]
+    #         await ctx.send(f"目前警吉有: {police_list}")
+    #     else:
+    #         await ctx.message.channel.send("This function only can be used by MOD.")
 
-    @commands.command()
+    @commands.hybrid_command(name="大量移除訊息", help="MOD專用-批量移除訊息")
     async def purge(self, ctx, num: int):
         if is_mod(ctx.author.id):
             await ctx.channel.purge(limit=num + 1)
+            await ctx.reply(f"已移除{num}行訊息")
         else:
-            await ctx.message.channel.send("This function only can be used by MOD.")
+            await ctx.reply("This function only can be used by MOD.")
 
     @commands.command()
     async def get_user_id(self, ctx):
@@ -177,7 +170,7 @@ class React(cog_ext):
     #     else:
     #         await ctx.message.channel.send("This function only can be used by MOD.")
             
-    @commands.command()
+    @commands.hybrid_command(name="新增mod",hidden=True)
     async def add_mod(self, ctx, member: discord.Member=None):
         if is_mod(ctx.author.id):
             try:
@@ -192,7 +185,7 @@ class React(cog_ext):
             await ctx.message.channel.send("This function only can be used by MOD.")
         reload_setting()
     
-    @commands.command()
+    @commands.hybrid_command(name="移除mod",hidden=True)
     async def rm_mod(self, ctx, member: discord.Member=None):
         if is_mod(ctx.author.id):
             try:
@@ -206,15 +199,16 @@ class React(cog_ext):
         reload_setting()
 
 
-    @commands.command()
+    @commands.hybrid_command(name="領身分組",help="領取身分組以獲得特定通知")
     async def add_role(self, ctx):
         embed = discord.Embed(title="來拿身分組~~", type="rich", color=0x8400ff,
                               description=f"點下面的按鈕就可以收到特定的通知喔\n"
                                         "\n"
                                         "討海人 - 部長的不定時3+3通知\n"
-                                        "廢墟飛機 - 薯片帶你去廢墟挖夢想",
+                                        "廢墟飛機 - 薯片帶你去廢墟挖夢想\n"
+                                        "機器人工程師 - 讓你可以控制機器龍\n",
                               )
-        await ctx.message.channel.send(view=button_view(),embed = embed)
+        await ctx.send(view=button_view(),embed = embed)
 
     # @commands.command()
     # @commands.cooldown(1, 600, commands.BucketType.user)
@@ -259,5 +253,13 @@ class button_view(discord.ui.View):
         user = interaction.user
         guild = interaction.guild
         role = discord.utils.get(guild.roles, name="廢墟飛機")
+        await user.add_roles(role)
+        await interaction.response.send_message(f"I have given you {role.mention}!", ephemeral = True)
+        
+    @discord.ui.button(label = "機器人工程師",  custom_id = "engineer_button")
+    async def enginner(self, interaction: discord.Interaction, button: discord.ui.Button):
+        user = interaction.user
+        guild = interaction.guild
+        role = discord.utils.get(guild.roles, name="機器人工程師")
         await user.add_roles(role)
         await interaction.response.send_message(f"I have given you {role.mention}!", ephemeral = True)
