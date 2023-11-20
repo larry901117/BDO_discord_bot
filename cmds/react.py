@@ -76,9 +76,9 @@ class React(cog_ext):
     async def purge(self, ctx, num: int):
         if is_mod(ctx.author.id):
             await ctx.channel.purge(limit=num + 1)
-            await ctx.reply(f"已移除{num}行訊息")
+            await ctx.message.channel.send(f"已移除{num}行訊息")
         else:
-            await ctx.reply("This function only can be used by MOD.")
+            await ctx.message.channel.send("This function only can be used by MOD.")
 
     @commands.command()
     async def get_user_id(self, ctx):
