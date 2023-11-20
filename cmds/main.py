@@ -3,7 +3,7 @@ from core.cog_ext import cog_ext
 
 
 class Main(cog_ext):
-    @commands.command()
+    @commands.hybrid_command(name="ping",description="查詢bot ping")
     async def ping(self, ctx):
         await ctx.send(ctx.bot.latency)
 
